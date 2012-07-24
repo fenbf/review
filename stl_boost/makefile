@@ -1,5 +1,6 @@
 CC=g++
-CFLAGS=-Wall -W -DDEBUG -g
+INCLUDES=../utils/
+CFLAGS=-Wall -W -DDEBUG -g -I $(INCLUDES)
 
 all: strings iterators
 
