@@ -1,8 +1,11 @@
 CC=g++
 INCLUDES=../utils/
-CFLAGS=-Wall -W -DDEBUG -g -I $(INCLUDES)
+CFLAGS=-Wall -W -I $(INCLUDES)
 
 all: simple_sort
+
+debug: CFLAGS += -DDEBUG -g
+debug: all
 
 clean:
 	rm -f *.exe

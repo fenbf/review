@@ -65,6 +65,33 @@ void selectionSort(Iterator start, Iterator end)
 	}
 }
 
+template <class Iterator>
+void insertionSort(Iterator start, Iterator end)
+{
+	// find min and put it in the beginning
+	Iterator m = start;
+	for (Iterator i = start+1; i != end; ++i)
+	{
+		if ((*i) < (*m)) 
+			m = i;
+	}
+	swap(*m, *start);
+	
+	// insertion
+	Iterator j;	
+	for (Iterator i = start+2; i != end; ++i)
+	{
+		typename iterator_traits<Iterator>::value_type temp = (*i);
+		j = i;
+		while (temp < (*(j-1)))
+		{
+			*j = *(j-1);
+			j--;
+		}
+		*j = temp;
+	}
+}
+
 struct Data
 {
 	int key;
@@ -87,12 +114,14 @@ struct Data
 	}
 };
 
-int main(/*int argc, const char **argv*/)
+int main(int argc, const char **argv)
 {
 	typedef vector<Data> container;
-	const int NUM = 7000;
+	const int NUM = argc > 1 ? atoi(argv[1]) : 1000;
 	const int MAX_KEY = NUM*2;
 	srand(time(NULL));
+	
+	cout << "NUM ELEMENTS: " << NUM << endl;
 	
 	container orginal;
 	for (int i = 0; i < NUM; ++i)
@@ -105,7 +134,7 @@ int main(/*int argc, const char **argv*/)
 	
 	//printAll(stlVec.begin(), stlVec.end());
 	
-	container tempVec(orginal);
+	container tempVec(stlVec);
 	START_TIMER("my bubble sort");
 		bubbleSort(tempVec.begin(), tempVec.end());
 	END_TIMER;
@@ -115,11 +144,17 @@ int main(/*int argc, const char **argv*/)
 		selectionSort(tempVec2.begin(), tempVec2.end());
 	END_TIMER;
 	
-	//printAll(tempVec.begin(), tempVec.end());
+	container tempVec3(orginal);
+	START_TIMER("my insertion sort");
+		insertionSort(tempVec3.begin(), tempVec3.end());
+	END_TIMER;
+	
+	//printAll(tempVec3.begin(), tempVec3.end());
 	
 	cout << "comparing results... " << endl;
 	if (compare(stlVec.begin(), stlVec.end(), tempVec.begin(), tempVec.end()) &&
-	    compare(stlVec.begin(), stlVec.end(), tempVec2.begin(), tempVec2.end()))
+	    compare(stlVec.begin(), stlVec.end(), tempVec2.begin(), tempVec2.end()) &&
+		compare(stlVec.begin(), stlVec.end(), tempVec3.begin(), tempVec3.end()))
 		cout << "OK!" << endl;
 	else
 		cout << "Wrong!" << endl;
