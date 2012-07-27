@@ -30,7 +30,7 @@ int main(const int argc, const char **argv)
 		tempKey[tempKey.size()-1] = '\0';
 		k = string(&tempKey[0]);
 	}
-
+	
 	/*
 	for (auto k : stringKeys)
 		cout << k << endl;
