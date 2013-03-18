@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <ctime>
 #include <memory>
+#include <iterator>
 #include <algorithm>
 
 using namespace std;
@@ -23,8 +24,9 @@ int main(/*int argc, const char **argv*/)
 		return a > b;
 	});
 	
-	for (int i : vec)
-		cout << i << ", ";
+	//for (int i : vec)
+	//		cout << i << ", ";
+	std::copy(vec.begin(), vec.end(), std::ostream_iterator<int>(std::cout, ", "));
 	cout << endl;
 	
 	return 0;
