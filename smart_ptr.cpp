@@ -5,8 +5,8 @@
 class Test
 {
 public:
-  Test():m_value(0) { std::cout << "Test::Test" << std::endl; }
-	Test(const Test &t):m_value(0) { std::cout << "Test::Test copy" << std::endl; }
+	Test() :m_value(0) { std::cout << "Test::Test" << std::endl; }
+	Test(const Test &t) :m_value(0) { std::cout << "Test::Test copy" << std::endl; }
 	~Test() { std::cout << "Test::~Test destructor" << std::endl; }
 
 	int m_value;
@@ -22,12 +22,13 @@ void UniquePtrArrayTest();
 void SharedPtrTest();
 void SharedPtrArrayTest();
 void SharedPtrParamTest();
+void SharedPtrCastTest();
 ///////////////////////////////////////////////////////////////////////////////
 
 void main()
 {
 	//AutoPtrTest();
-	
+
 	//UniquePtrTest();
 
 	//UniquePtrArrayTest();
@@ -36,10 +37,9 @@ void main()
 
 	//SharedPtrArrayTest();
 
-	SharedPtrParamTest();
+	//SharedPtrParamTest();
 
-	int a = 0;
-	return;
+	SharedPtrCastTest();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ void AutoPtrTest()
 {
 	TestAutoPtr myTest(new Test());
 	doSomethig(myTest);
-	
+
 	myTest->m_value = 10;
 }
 
@@ -70,7 +70,7 @@ void UniquePtrTest()
 {
 	TestUniquePtr myTest(new Test());
 	doSomethig(std::move(myTest));
-	
+
 	// myTest->m_value = 10;	// runtime error, but this time on purpose!
 }
 
@@ -93,8 +93,6 @@ void SharedPtrTest()
 	std::shared_ptr<Test> sp(new Test());
 
 	std::shared_ptr<Test> sp2 = std::make_shared<Test>();
-
-	int a;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,7 +100,7 @@ void SharedPtrTest()
 
 void SharedPtrArrayTest()
 {
-	std::shared_ptr<Test> sp(new Test[2], [](Test *p) { delete [] p; });
+	std::shared_ptr<Test> sp(new Test[2], [](Test *p) { delete[] p; });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,4 +122,60 @@ void SharedPtrParamTest()
 
 	testSharedFunc(sp);
 	testSharedFuncRef(sp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// shared ptr cast
+
+class BaseA
+{
+protected:
+	int a{ 0 };
+public:
+	virtual ~BaseA() { }
+
+	void A(int p) { a = p; }
+};
+
+class ChildB : public BaseA
+{
+private:
+	int b{ 0 };
+public:
+	void B(int p) { b = p; }
+};
+
+class BadChild
+{
+private:
+	int c{ 0 };
+public:
+	void C(int p) { c = p; }
+};
+
+void SharedPtrCastTest()
+{
+	std::shared_ptr<BaseA> ptrBase = std::make_shared<ChildB>();
+	ptrBase->A(10);
+	std::cout << "use count A: " << ptrBase.use_count() << std::endl;
+	
+	// manual:
+	ChildB *ptrMan = dynamic_cast<ChildB *>(ptrBase.get());
+	ptrMan->B(10);
+
+	// ok:
+	std::shared_ptr<ChildB> ptrChild = std::dynamic_pointer_cast<ChildB>(ptrBase);
+	if (ptrChild)
+	{
+		ptrChild->B(20);
+		std::cout << "use count A: " << ptrBase.use_count() << std::endl;
+		std::cout << "use count B: " << ptrChild.use_count() << std::endl;
+	}	
+
+	// bad:
+	std::shared_ptr<BadChild> ptrBad = std::dynamic_pointer_cast<BadChild>(ptrBase);
+	if (!ptrBad)
+	{
+		std::cout << "problem with cast!" << std::endl;
+	}
 }
