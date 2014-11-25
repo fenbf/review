@@ -11,7 +11,7 @@ ifeq "$(cpp11)" "1"
 	CFLAGS += -std=c++0x
 endif
 
-all: strings iterators boostTest searching pointers lambda
+all: strings iterators boostTest searching pointers lambda beautiful
 
 .PHONY : clean
 clean:
@@ -36,4 +36,8 @@ pointers: pointers.cpp
 	
 lambda: CFLAGS += -std=c++0x	
 lambda: lambda.cpp
+	$(CC) $(CFLAGS) $< -o $@
+	
+beautiful: CFLAGS += -std=c++11	
+beautiful: beautiful_std_alg.cpp
 	$(CC) $(CFLAGS) $< -o $@
