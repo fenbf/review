@@ -38,6 +38,6 @@ lambda: CFLAGS += -std=c++0x
 lambda: lambda.cpp
 	$(CC) $(CFLAGS) $< -o $@
 	
-beautiful: CFLAGS += -std=c++11	
+beautiful: CFLAGS += -std=c++1y	
 beautiful: beautiful_std_alg.cpp
 	$(CC) $(CFLAGS) $< -o $@

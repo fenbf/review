@@ -84,10 +84,15 @@ void insertionSortTest()
 //
 // 3. slide from Cpp Seasoning
 //
-template <typename randiter> auto slide(randiter f, randiter l, randiter p) -> std::pair<randiter, randiter>
+// bug in GCC std: https://gcc.gnu.org/ml/gcc-help/2013-10/msg00000.html
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58357
+// http://stackoverflow.com/questions/23993333/stdrotate-return-value-in-gcc-4-9
+// std::rotate returns only void... but should an iterator...
+
+template <typename randIter> auto slide(randIter f, randIter l, randIter p) -> std::pair<randIter, randIter>
 {
-	if (p < f) return { p, rotate(p, f, l) };
-	if (l < p) return { rotate(f, l, p), p };
+	if (p < f) return { p, std::rotate(p, f, l) ); 
+	if (l < p) return { std::rotate(f, l, p), p };
 	return { f, l };
 }
 
