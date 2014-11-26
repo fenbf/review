@@ -16,6 +16,10 @@
 
 #define PRINT_TEST_TITLE() std::cout << std::endl << "*** " << __func__ << " ***" << std::endl;
 
+//
+// helper functions
+//
+
 template <typename T> void printAll(T start, T end, const std::string &title = "")
 {
 	if (!title.empty())
@@ -56,30 +60,30 @@ void insertionSortTest()
 //
 // 2. quick sort made with std::algorithm building blocks
 //
-// template<class FwdIt, class Compare = std::less<>>
-// void quickSort(FwdIt first, FwdIt last, Compare cmp = Compare{})
-// {
-	// auto const N = std::distance(first, last);
-	// if (N <= 1) return; 
-	// auto const pivot = std::next(first, N / 2);
-	// std::nth_element(first, pivot, last, cmp);
-	// quickSort(first, pivot, cmp); // assert(std::is_sorted(first, pivot, cmp));
-	// quickSort(pivot, last, cmp);  // assert(std::is_sorted(pivot, last, cmp));
+template<class FwdIt, class Compare = std::less<>>
+void quickSort(FwdIt first, FwdIt last, Compare cmp = Compare{})
+{
+	auto const N = std::distance(first, last);
+	if (N <= 1) return; 
+	auto const pivot = std::next(first, N / 2);
+	std::nth_element(first, pivot, last, cmp);
+	quickSort(first, pivot, cmp); // assert(std::is_sorted(first, pivot, cmp));
+	quickSort(pivot, last, cmp);  // assert(std::is_sorted(pivot, last, cmp));
 
-	// // can be optimized by adding insertionSort call for small ranges (like 7...)
-// }
+	// can be optimized by adding insertionSort call for small ranges (like 7...)
+}
 
-// void quickSortTest()
-// {
-	// PRINT_TEST_TITLE();
+void quickSortTest()
+{
+	PRINT_TEST_TITLE();
 
-	// int intArray[5];
-	// generateRand(intArray, intArray + 5, 1);
-	// printAll(intArray, intArray + 5, "before");
+	int intArray[5];
+	generateRand(intArray, intArray + 5, 1);
+	printAll(intArray, intArray + 5, "before");
 
-	// quickSort(intArray, intArray + 5);
-	// printAll(intArray, intArray + 5, "after");
-// }
+	quickSort(intArray, intArray + 5);
+	printAll(intArray, intArray + 5, "after");
+}
 
 //
 // 3. slide from Cpp Seasoning
@@ -89,6 +93,12 @@ void insertionSortTest()
 // http://stackoverflow.com/questions/23993333/stdrotate-return-value-in-gcc-4-9
 // std::rotate returns only void... but should an iterator...
 
+#ifdef __GNUC__
+void slideTest() 
+{
+	#warning "GCC version of this code is missing due to a bug in std lib"
+}
+#else
 template <typename randIter> auto slide(randIter f, randIter l, randIter p) -> std::pair<randIter, randIter>
 {
 	if (p < f) return { p, std::rotate(p, f, l) ); 
@@ -108,37 +118,48 @@ void slideTest()
 	printAll(std::begin(dvec), std::end(dvec), "+ 3 right");
 	std::cout << *(p.first) << std::endl;
 }
+#endif
 
 //
-// X. trim for strings
+// 4. trim for strings
 //
-// std::string trimLeft(const std::string &s) {
-	// auto temp = s;
-	// temp.erase(std::begin(temp), std::find_if(std::begin(temp), std::end(temp), [](char c){return !std::isspace(c, std::locale()); }));
-	// return temp;
-// }
+std::string trimLeft(const std::string &s) {
+	auto temp = s;
+	temp.erase(std::begin(temp), std::find_if(std::begin(temp), std::end(temp), [](char c){return !std::isspace(c, std::locale()); }));
+	return temp;
+}
 
-// std::string trimRight(const std::string &s) {
-	// auto temp = s;
-	// temp.erase(std::find_if(std::rbegin(temp), std::rend(temp), [](char c){return !std::isspace(c, std::locale()); }).base(), std::end(temp));
-	// return temp;
-// }
+#ifdef __GNUC__
+std::string trimRight(const std::string &s) {
+	auto temp = s;
+	auto tempRbeg = temp.rbegin();
+	auto tempRend = temp.rend();
+	temp.erase(std::find_if(tempRbeg, tempRend, [](char c){return !std::isspace(c, std::locale()); }).base(), std::end(temp));
+	return temp;
+}
+#else
+std::string trimRight(const std::string &s) {
+	auto temp = s;
+	temp.erase(std::find_if(std::rbegin(temp), std::rend(temp), [](char c){return !std::isspace(c, std::locale()); }).base(), std::end(temp));
+	return temp;
+}
+#endif
 
-// std::string trim(const std::string &s) {
-	// return trimLeft(trimRight(s));
-// }
+std::string trim(const std::string &s) {
+	return trimLeft(trimRight(s));
+}
 
-// void trimStringTest()
-// {
-	// PRINT_TEST_TITLE();
+void trimStringTest()
+{
+	PRINT_TEST_TITLE();
 
-	// std::string test = "   Hello World 1   ";
-	// std::cout << "\"" << test << "\" -> \"" << trimLeft(test) << "\"" << std::endl;
-	// std::string test2 = "   Hello World 2   ";
-	// std::cout << "\"" << test2 << "\" -> \"" << trimRight(test2) << "\"" << std::endl;
-	// std::string test3 = "   Hello World 3   ";
-	// std::cout << "\"" << test3 << "\" -> \"" << trim(test3) << "\"" << std::endl;
-// }
+	std::string test = "   Hello World 1   ";
+	std::cout << "\"" << test << "\" -> \"" << trimLeft(test) << "\"" << std::endl;
+	std::string test2 = "   Hello World 2   ";
+	std::cout << "\"" << test2 << "\" -> \"" << trimRight(test2) << "\"" << std::endl;
+	std::string test3 = "   Hello World 3   ";
+	std::cout << "\"" << test3 << "\" -> \"" << trim(test3) << "\"" << std::endl;
+}
 
 //
 // X. sort with next_permutation
@@ -162,9 +183,18 @@ void permuteSortTest()
 
 int main()
 {
+	// 1:
 	insertionSortTest();
-	// quickSortTest();
-	// trimStringTest();
+	
+	// 2:
 	slideTest();
+	
+	// 3:
+	quickSortTest();
+	
+	// 4:
+	trimStringTest();
+	
+	// bonus: :)
 	permuteSortTest();
 }
