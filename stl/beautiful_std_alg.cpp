@@ -33,7 +33,7 @@ template <typename T> void printAll(T start, T end, const std::string &title = "
 }
 
 //
-// 5: random shuffle
+// X: random shuffle
 // 
 template <typename T, typename V> void generateRand(T start, T end, V startValue)
 {
@@ -125,17 +125,24 @@ void slideTest()
 	PRINT_TEST_TITLE();
 
 	int intArray[10] = { 0 };
-	intArray[2] = intArray[3] = intArray[4] = 1;
+	intArray[1] = intArray[2] = intArray[3] = 1;
 	printAll(std::begin(intArray), std::end(intArray), "initial");
 
-	auto p = slide(intArray + 2, intArray + 5, intArray + 7);
+	// move to the right those three '1'
+
+	auto p = slide(intArray + 1, intArray + 4, intArray + 6);
 	printAll(std::begin(intArray), std::end(intArray), "to id 6");
 	std::cout << "new range from " << std::distance(intArray, p.first) << " to " << std::distance(intArray, p.second) << " position" << std::endl;
+
+	// go back:
+	auto p2 = slide(p.first, p.second, intArray + 1);
+	printAll(std::begin(intArray), std::end(intArray), "back");
+	std::cout << "new range from " << std::distance(intArray, p2.first) << " to " << std::distance(intArray, p2.second) << " position" << std::endl;
 }
 #endif
 
 //
-// 5. gather (cpp seasoning)
+// 4. gather (cpp seasoning)
 //
 // use case: list of items, select some of items (good guys) and move the to position around p.
 // for instance: multiple selection on a list
@@ -167,8 +174,9 @@ void gatherTest()
 }
 
 //
-// 4. trim for strings
+// 5. trim for strings
 //
+// source: http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 std::string trimLeft(const std::string &s) {
 	auto temp = s;
 	temp.erase(std::begin(temp), std::find_if(std::begin(temp), std::end(temp), [](char c){return !std::isspace(c, std::locale()); }));
@@ -208,7 +216,7 @@ void trimStringTest()
 }
 
 //
-// X. sort with next_permutation
+// bonus :) sort with next_permutation
 //
 template <typename T> void permuteSort(T start, T end)
 {
@@ -231,16 +239,17 @@ int main()
 {
 	// 1:
 	insertionSortTest();
-	
+
 	// 2:
+	quickSortTest();
+
+	// 3:
 	slideTest();
 	
+	// 4:
 	gatherTest();
 	
-	// 3:
-	quickSortTest();
-	
-	// 4:
+	// 5:
 	trimStringTest();
 	
 	// bonus: :)
